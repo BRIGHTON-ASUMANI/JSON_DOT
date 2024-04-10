@@ -46,6 +46,7 @@ Click the "Convert" button to convert the JSON data to DOT syntax.
 If the conversion is successful and the JSON data is valid, a "Download Converted File" button will appear. Click this button to download the converted DOT file.
 
 ## Screenshots
+![Screenshot from 2024-04-10 15-07-25](https://github.com/BRIGHTON-ASUMANI/JSON_DOT/assets/36225890/d0857983-0085-4d5a-828a-0a2d5c0a1378)
 
 
 ## Contributors
