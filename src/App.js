@@ -10,6 +10,7 @@ function App() {
   const [jsonInput, setJsonInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState('');
+  const [isValidJson, setIsValidJson] = useState(true); // Track JSON validity
   const fileInputRef = useRef(null);
 
   const convertToDotSyntax = (jsonData) => {
@@ -47,10 +48,12 @@ function App() {
         const blob = new Blob([dotSyntax], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
         setDownloadUrl(url);
+        setIsValidJson(true); // Set JSON as valid
         toast.success('File uploaded and converted successfully.');
       } catch (error) {
         console.error(error);
         toast.error('Error: Invalid JSON format.');
+        setIsValidJson(false); // Set JSON as invalid
       }
     };
 
@@ -106,6 +109,7 @@ function App() {
             <Button variant="info" onClick={handleButtonClick}>
               Upload JSON File
             </Button>
+            {' '}
             {fileInputRef.current && fileInputRef.current.files.length > 0 && (
             <div className="mt-2">
               <strong>Uploaded File:</strong>
@@ -132,7 +136,7 @@ function App() {
             >
               {loading ? 'Converting...' : 'Convert'}
             </Button>
-            {downloadUrl && (
+            {downloadUrl && isValidJson && (
               <Button
                 className="mt-2 mr-3 btn btn-block"
                 variant="primary"
