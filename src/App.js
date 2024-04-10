@@ -136,15 +136,16 @@ function App() {
             >
               {loading ? 'Converting...' : 'Convert'}
             </Button>
-            {downloadUrl && isValidJson && (
+            {jsonInput || downloadUrl ? (
               <Button
                 className="mt-2 mr-3 btn btn-block"
                 variant="primary"
                 onClick={handleDownloadClick}
+                disabled={!isValidJson || loading}
               >
                 Download Converted File
               </Button>
-            )}
+            ) : null}
           </div>
         </Col>
       </Row>
