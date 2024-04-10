@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Form, Button, Container, Row, Col,
 } from 'react-bootstrap';
@@ -10,6 +10,7 @@ function App() {
   const [jsonInput, setJsonInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState('');
+  const fileInputRef = useRef(null); // Initializing with null
 
   const handleJsonInputChange = (event) => {
     setJsonInput(event.target.value);
@@ -71,12 +72,41 @@ function App() {
     }
   };
 
+  const handleFileInputChange = (event) => {
+    const file = event.target.files[0];
+    // Do something with the selected file
+    console.log('Selected file:', file);
+  };
+
+  const handleButtonClick = () => {
+    // Trigger the click event of the file input element
+    fileInputRef.current.click();
+  };
+
   return (
     <Container>
       <ToastContainer />
       <Row className="justify-content-center mt-5">
         <Col md={4}>
-          <Button variant="info">Upload</Button>
+          <div>
+            <input
+              type="file"
+              style={{ display: 'none' }}
+              accept=".json"
+              ref={fileInputRef}
+              onChange={handleFileInputChange}
+            />
+            <Button variant="info" onClick={handleButtonClick}>
+              Upload
+            </Button>
+            {fileInputRef.current && fileInputRef.current.files.length > 0 && (
+            <div className="mt-2">
+              <strong>Uploaded File:</strong>
+              {' '}
+              {fileInputRef.current.files[0].name}
+            </div>
+            )}
+          </div>
         </Col>
         <Col md={8}>
           <div>
