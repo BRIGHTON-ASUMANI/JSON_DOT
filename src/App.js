@@ -10,12 +10,7 @@ function App() {
   const [jsonInput, setJsonInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState('');
-  const fileInputRef = useRef(null); // Initializing with null
-
-  const handleJsonInputChange = (event) => {
-    setJsonInput(event.target.value);
-    setDownloadUrl(''); // Reset download URL when input changes
-  };
+  const fileInputRef = useRef(null);
 
   const convertToDotSyntax = (jsonData) => {
     let dotSyntax = '';
@@ -38,19 +33,43 @@ function App() {
     return dotSyntax;
   };
 
+  const handleFileInputChange = (event) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      const content = e.target.result;
+      setJsonInput(content);
+
+      try {
+        const jsonData = JSON.parse(content);
+        const dotSyntax = convertToDotSyntax(jsonData);
+        const blob = new Blob([dotSyntax], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        setDownloadUrl(url);
+        toast.success('File uploaded and converted successfully.');
+      } catch (error) {
+        console.error(error);
+        toast.error('Error: Invalid JSON format.');
+      }
+    };
+
+    reader.readAsText(file);
+  };
+
+  const handleButtonClick = () => {
+    fileInputRef.current.click();
+  };
+
   const handleConvertClick = async () => {
     setLoading(true);
     try {
       const jsonData = JSON.parse(jsonInput);
       const dotSyntax = convertToDotSyntax(jsonData);
-      // Create a Blob with dotSyntax
       const blob = new Blob([dotSyntax], { type: 'text/plain' });
-      // Create a URL for the Blob
       const url = URL.createObjectURL(blob);
-      setDownloadUrl(url); // Set download URL
-      // Reset loading state
+      setDownloadUrl(url);
       setLoading(false);
-      // Show success message
       toast.success('Conversion completed.');
     } catch (error) {
       console.error(error);
@@ -61,33 +80,21 @@ function App() {
 
   const handleDownloadClick = () => {
     if (downloadUrl) {
-      // Create a temporary anchor element to trigger the download
       const a = document.createElement('a');
       a.href = downloadUrl;
       a.download = 'converted.dot';
       document.body.appendChild(a);
       a.click();
-      // Remove the temporary anchor element
       document.body.removeChild(a);
     }
-  };
-
-  const handleFileInputChange = (event) => {
-    const file = event.target.files[0];
-    // Do something with the selected file
-    console.log('Selected file:', file);
-  };
-
-  const handleButtonClick = () => {
-    // Trigger the click event of the file input element
-    fileInputRef.current.click();
   };
 
   return (
     <Container>
       <ToastContainer />
       <Row className="justify-content-center mt-5">
-        <Col md={4}>
+        <Col md={8}>
+          <h3>Upload JSON File or Paste JSON Data</h3>
           <div>
             <input
               type="file"
@@ -97,7 +104,7 @@ function App() {
               onChange={handleFileInputChange}
             />
             <Button variant="info" onClick={handleButtonClick}>
-              Upload
+              Upload JSON File
             </Button>
             {fileInputRef.current && fileInputRef.current.files.length > 0 && (
             <div className="mt-2">
@@ -107,17 +114,14 @@ function App() {
             </div>
             )}
           </div>
-        </Col>
-        <Col md={8}>
-          <div>
-            <h3>Paste JSON Data</h3>
+          <div className="mt-2">
             <Form.Group>
               <Form.Control
                 as="textarea"
                 className="md-2"
                 rows={10}
                 value={jsonInput}
-                onChange={handleJsonInputChange}
+                onChange={(e) => setJsonInput(e.target.value)}
               />
             </Form.Group>
             <Button
