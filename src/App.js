@@ -14,7 +14,7 @@ function App() {
   const fileInputRef = useRef(null);
 
   const convertToDotSyntax = (jsonData) => {
-    let dotSyntax = '';
+    let dotSyntax = 'digraph G {\n\n';
 
     jsonData.forEach((item) => {
       const properties = Object.entries(item)
@@ -22,14 +22,16 @@ function App() {
           if (typeof value === 'string') {
             return `${key}="${value}"`;
           } if (typeof value === 'object') {
-            const innerProps = Object.entries(value)
-              .map(([innerKey, innerValue]) => `${innerKey}=${innerValue}`);
-            return `${key} [${innerProps.join(', ')}]`;
+            return Object.entries(value)
+              .map(([innerKey, innerValue]) => `${innerKey}=${innerValue}`)
+              .join(', ');
           }
           return '';
         });
-      dotSyntax += `${item.id} [${properties.join(', ')}]\n`;
+      dotSyntax += `${item.id} [${properties.join(', ')}];\n`;
     });
+
+    dotSyntax += '\n}';
 
     return dotSyntax;
   };
@@ -75,20 +77,36 @@ function App() {
       setLoading(false);
       toast.success('Conversion completed.');
     } catch (error) {
-      console.error(error);
       toast.error('Error: Invalid JSON format.');
       setLoading(false);
     }
   };
 
   const handleDownloadClick = () => {
-    if (downloadUrl) {
-      const a = document.createElement('a');
-      a.href = downloadUrl;
-      a.download = 'converted.dot';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+    if (jsonInput) {
+      try {
+        const jsonData = JSON.parse(jsonInput);
+        const dotSyntax = convertToDotSyntax(jsonData);
+        const blob = new Blob([dotSyntax], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'converted.txt'; // Setting the file name with .txt extension
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        // Revoke the object URL to free up resources
+        URL.revokeObjectURL(url);
+
+        toast.success('File downloaded successfully.');
+      } catch (error) {
+        console.error(error);
+        toast.error('Error: Unable to download file.');
+      }
+    } else {
+      toast.error('Error: No data to download.');
     }
   };
 
