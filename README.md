@@ -1,4 +1,5 @@
 # JSON to DOT Converter
+![Screenshot from 2024-04-13 19-40-31](https://github.com/BRIGHTON-ASUMANI/JSON_DOT/assets/36225890/196ab80f-7ffc-46ef-9cc8-77832c9ccc02)
 
 The JSON to DOT Converter is a simple web application that allows users to convert JSON data into DOT syntax for graph visualization purposes.
 
